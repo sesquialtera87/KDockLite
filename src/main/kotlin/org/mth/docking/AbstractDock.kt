@@ -27,7 +27,6 @@ package org.mth.docking
 import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import com.formdev.flatlaf.extras.components.FlatButton
-import com.formdev.flatlaf.ui.FlatUIUtils
 import java.awt.*
 import java.util.*
 import javax.swing.*
@@ -49,7 +48,7 @@ abstract class AbstractDock : JPanel() {
          * @return The cached theme-aware [Icon] resource.
          */
         fun getMinimizeIcon(): Icon {
-            val key = "kdock.minimizeIcon"
+            val key = "kdock.icon.minimize"
             return UIManager.getIcon(key) ?: run {
                 val path =
                     if (FlatLaf.isLafDark()) "org/mth/docking/minimize_dark.svg" else "org/mth/docking/minimize.svg"
@@ -62,7 +61,7 @@ abstract class AbstractDock : JPanel() {
          */
         val closeIcon: Icon
             get() {
-                val key = "kdock.closeIcon"
+                val key = "kdock.icon.close"
                 return UIManager.getIcon(key) ?: run {
                     val path =
                         if (FlatLaf.isLafDark()) "org/mth/docking/close_dark.svg" else "org/mth/docking/close.svg"
@@ -74,14 +73,14 @@ abstract class AbstractDock : JPanel() {
          * Fallback typography font family model used globally by the docking layout title labels.
          */
         val headerFont: Font
-            get() = UIManager.getFont("dock.headerFont") ?: FlatUIUtils.nonUIResource(UIManager.getFont("h4.font"))
+            get() = UIManager.getFont("kdock.header.font") ?: UIManager.getFont("h4.font")
 
         /**
          * Resolves the background color for the dock header bar, fallbacking to the theme's default menu item background.
          */
         val headerBackground: Color
-            get() = UIManager.getColor("dock.headerBackground")
-                ?: FlatUIUtils.nonUIResource(UIManager.getColor("MenuItem.background"))
+            get() = UIManager.getColor("kdock.header.background")
+                ?: UIManager.getColor("MenuItem.background")
 
         /**
          * Structural resource bundle containing internal localizations for tooltips and accessibility parameters.
@@ -189,6 +188,7 @@ abstract class AbstractDock : JPanel() {
     abstract class AbstractDockHeader(val dock: AbstractDock) : JPanel() {
         /** The main text title caption rendered inside the header layout area. */
         abstract var title: String?
+
         /** The primary graphic brand icon pinned next to the header text caption. */
         abstract var icon: Icon?
     }
@@ -221,14 +221,14 @@ abstract class AbstractDock : JPanel() {
 
         /** Text label backing container displaying the active dock descriptive title string. */
         internal val titleLabel = JLabel().apply {
-            font = headerFont
             iconTextGap = 10
             isOpaque = false
+            font = headerFont
+            UIManager.getColor("kdock.header.foreground")?.let { this.foreground = it }
         }
 
         /** Sub-panel container grouping functional structural action window buttons. */
         val toolBar = JPanel().apply {
-            // FIX: Removed gap offsets to ensure neat alignment matching IDE design patterns
             layout = FlowLayout(FlowLayout.RIGHT, 0, 0)
             isOpaque = false
             add(minimizeButton)

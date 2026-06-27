@@ -31,6 +31,7 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
     enum class SouthLayoutMode {
         /** South panel is constrained in the middle between West and East sidebars. */
         COMPRESSED,
+
         /** South panel takes the full window width underneath West and East sidebars. */
         EXTENDED
     }
@@ -45,17 +46,11 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
         internal var toolIconSize = 24
         internal var centralComponent: JComponent? = null
         internal var southLayoutMode = SouthLayoutMode.COMPRESSED
-        internal var dividerSize = 8
         internal val docks = mapOf(
             WEST to mutableSetOf(),
             EAST to mutableSetOf(),
             SOUTH to mutableSetOf<String>(),
         )
-
-        fun setDividerSize(size: Int): WorkspaceBuilder {
-            dividerSize = size
-            return this
-        }
 
         fun southDockLocation(location: Int): WorkspaceBuilder {
             require(location == SOUTH_EAST || location == SOUTH_WEST || location == SOUTH)
@@ -110,7 +105,6 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
         }
     }
 
-    internal var dividerSize = builder.dividerSize
     internal var singleDockFactory: (String) -> DockInfo? = builder.singleDockFactory
 
     internal val southLayoutMode = builder.southLayoutMode
