@@ -61,7 +61,7 @@ class DockSide(val workspace: Workspace, var split: FlatSplitPane, var sideLocat
     var lastDividerLocation: Int = -1
 
     /** Tracks the structural thickness of the split divider component before folding into hidden mode. */
-    var lastDividerSize: Int = workspace.dividerSize
+    var lastDividerSize: Int = UIManager.getInt("kdock.divider.size")
 
     init {
         require(sideLocation == SwingConstants.WEST || sideLocation == SwingConstants.EAST || sideLocation == SwingConstants.SOUTH)

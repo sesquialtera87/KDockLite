@@ -31,6 +31,7 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
     enum class SouthLayoutMode {
         /** South panel is constrained in the middle between West and East sidebars. */
         COMPRESSED,
+
         /** South panel takes the full window width underneath West and East sidebars. */
         EXTENDED
     }
@@ -42,20 +43,13 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
         internal var westDockVisible = true
         internal var eastDockVisible = true
         internal var southDockLocation = SOUTH
-        internal var toolIconSize = 24
         internal var centralComponent: JComponent? = null
         internal var southLayoutMode = SouthLayoutMode.COMPRESSED
-        internal var dividerSize = 8
         internal val docks = mapOf(
             WEST to mutableSetOf(),
             EAST to mutableSetOf(),
             SOUTH to mutableSetOf<String>(),
         )
-
-        fun setDividerSize(size: Int): WorkspaceBuilder {
-            dividerSize = size
-            return this
-        }
 
         fun southDockLocation(location: Int): WorkspaceBuilder {
             require(location == SOUTH_EAST || location == SOUTH_WEST || location == SOUTH)
@@ -88,11 +82,6 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
             return this
         }
 
-        fun setToolIconSize(iconSize: Int): WorkspaceBuilder {
-            this.toolIconSize = iconSize
-            return this
-        }
-
         fun setCentralComponent(component: JComponent): WorkspaceBuilder {
             this.centralComponent = component
             return this
@@ -105,12 +94,14 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
         }
 
         fun build(): Workspace {
-            TOOL_ICON_SIZE = toolIconSize
+            if (UIManager.getInt("kdock.divider.size") == 0) {
+                UIManager.put("kdock.divider.size", 8)
+            }
+
             return Workspace(this)
         }
     }
 
-    internal var dividerSize = builder.dividerSize
     internal var singleDockFactory: (String) -> DockInfo? = builder.singleDockFactory
 
     internal val southLayoutMode = builder.southLayoutMode
@@ -275,7 +266,6 @@ class Workspace private constructor(builder: WorkspaceBuilder) : JPanel() {
     }
 
     companion object {
-        internal var TOOL_ICON_SIZE: Int = 24
         val log: Logger = Logger.getLogger(Workspace::class.java.name)
     }
 }
