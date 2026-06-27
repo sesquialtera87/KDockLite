@@ -4,7 +4,8 @@
 [![Java Compatibility](https://img.shields.io/badge/java-11%2B-orange?logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![UI Style](https://img.shields.io/badge/L%26F-FlatLaf-blue?style=flat)](https://www.formdev.com/flatlaf/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![GitHub repo size](https://img.shields.io/github/repo-size/sesquialtera87/KDockLite?color=blueviolet)](https://github.com/IL_TUO_USERNAME/KDockLite)
+[![](https://jitpack.io/v/sesquialtera87/KDockLite.svg)](https://jitpack.io/#sesquialtera87/KDockLite)
+[![GitHub repo size](https://img.shields.io/github/repo-size/sesquialtera87/KDockLite?color=blueviolet)](https://github.com/sesquialtera87/KDockLite)
 
 A lightweight, high-performance, and fully customizable docking layout system for
 Java and Kotlin desktop applications built on top of [FlatLaf](https://www.formdev.com/flatlaf/).
@@ -13,6 +14,7 @@ This framework allows developers to build flexible IDE-like user interfaces with
 tear-out floating utility windows, and robust layout persistence.
 
 ## Key Features
+
 - **Tri-Sidebar Anchor Topology**: Seamlessly dock panels to the `WEST`, `EAST`, or `SOUTH` regions of your application.
 - **Floating Windows (Detachment)**: Context-click any dock to detach it into an autonomous floating `JDialog` utility window that remembers its dimensions and coordinates.
 - **Dynamic Layout**: Advanced routing of the central canvas component using `COMPRESSED` or `EXTENDED` horizontal bounding modes for the southern dock layout.
@@ -20,6 +22,7 @@ tear-out floating utility windows, and robust layout persistence.
 - **FlatLaf Native Look & Feel**: Built from the ground up utilizing `FlatSplitPane`, `FlatToolBar`, and `FlatToggleButton` for a modern, sleek interface.
 
 ## Workspace Setup & Initialization
+
 The framework leverages a fluent `WorkspaceBuilder` pattern to construct and assemble the structural topography of your user interface.
 
 ```kotlin
@@ -35,7 +38,7 @@ val workspace = Workspace.WorkspaceBuilder()
     .setSingleDockFactory { id ->
         when (id) {
             "project-view" -> Pair(ProjectViewDock(), SwingConstants.WEST)
-            "console-log"  -> Pair(ConsoleDock(), SwingConstants.SOUTH)
+            "console-log" -> Pair(ConsoleDock(), SwingConstants.SOUTH)
             else -> null
         }
     }
@@ -55,27 +58,29 @@ JFrame("My App IDE").apply {
 ```
 
 ## Layout Topologies (`SouthLayoutMode`)
+
 The framework offers two structural layout hierarchy options via `.southLayoutMode(...)`:
 
 - `COMPRESSED`: The southern dock pane is constrained in the middle, sitting strictly between the `WEST` and `EAST` sidebars.
 - `EXTENDED`: The southern dock pane spans across the entire horizontal footprint of the window, sitting completely underneath the sidebars.
 
 ## UI Customization via UIManager
+
 The look and feel of the docking framework is fully decoupled from the core logic and can be stylized globally using `UIManager` look-and-feel tokens.
 
-By targeting the custom `"dock.*"` property keys before building your UI, you can fully match your application's active `FlatLaf` dark or light theme.
+By targeting the custom `"kdock.*"` property keys before building your UI, you can fully match your application's active `FlatLaf` dark or light theme.
 
-| Key Property                     | Type     | Description                                                                                                          |
-|:---------------------------------|:---------|:---------------------------------------------------------------------------------------------------------------------|
-| `dock.header.background`         | `Color`  | The background color of the title bar (`AbstractDockHeader`) for each docked panel.                                  |
-| `dock.header.foreground`         | `Color`  | The foreground (text) color of the active dock title.                                                                |
-| `dock.header.font`               | `Font`   | The typography font applied to the title text label inside the header.                                               |
-| `dock.header.border`             | `Border` | An optional border surrounding the dock header UI area.                                                              |
-| `dock.button.selectedBackground` | `Color`  | The background color of the toolbar toggle buttons (e.g., `FlatToggleButton`) when their corresponding dock is open. |
-| `dock.toolbar.background`        | `Color`  | The background color of the side tools panel framework (`FlatToolBar`).                                              |
-| `dock.divider.hoverColor`        | `Color`  | The accent highlight color applied to the component splitter (`FlatSplitPane`) during drag or hover interactions.    |
+| Key Property              | Type    | Description                                                                         |
+|:--------------------------|:--------|:------------------------------------------------------------------------------------|
+| `kdock.header.background` | `Color` | The background color of the title bar (`AbstractDockHeader`) for each docked panel. |
+| `kdock.header.foreground` | `Color` | The foreground (text) color of the dock title.                                      |
+| `kdock.header.font`       | `Font`  | The typography font applied to the title text label inside the header.              |
+| `kdock.divider.size`      | `Int`   | The divider size of the component splitter (`FlatSplitPane`).                       |
+| `kdock.icon.minimize`     | `Icon`  | The icon of the header button which minimizes the dock.                             |
+| `kdock.icon.close`        | `Icon`  | The icon of the header button which closes the dock.                                |
 
 ## State Persistence
+
 Saving and loading the user's customized sidebar state layout requires just a simple method invoke target:
 
 ```kotlin
