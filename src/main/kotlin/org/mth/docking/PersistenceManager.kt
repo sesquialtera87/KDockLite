@@ -22,7 +22,6 @@
 
 package org.mth.docking
 
-import org.jetbrains.annotations.NonNls
 import java.awt.Dimension
 import java.awt.Point
 import java.util.logging.Logger
@@ -38,7 +37,6 @@ import javax.swing.SwingUtilities
  */
 object PersistenceManager {
 
-    @NonNls
     private val log = Logger.getLogger(PersistenceManager.javaClass.name)
 
     /**

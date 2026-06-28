@@ -8,6 +8,4 @@ module KDockLite {
     requires java.logging;
 
     requires kotlin.stdlib;
-
-    requires annotations;
 }
