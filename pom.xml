@@ -8,12 +8,29 @@
     <artifactId>KDockLite</artifactId>
     <version>1.0-SNAPSHOT</version>
     <url>https://github.com/sesquialtera87/KDockLite</url>
+    <name>KDockLite</name>
+    <description>A lightweight and flexible docking framework for Java/Kotlin Swing applications.</description>
+
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
 
     <developers>
         <developer>
             <name>Mattia Marelli</name>
             <email>sesquialtera87@gmail.com</email>
             <url>https://github.com/sesquialtera87</url>
+            <roles>
+                <role>Architect</role>
+                <role>Developer</role>
+            </roles>
+            <timezone>Europe/Rome</timezone>
         </developer>
     </developers>
 
