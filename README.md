@@ -62,12 +62,41 @@ JFrame("My App IDE").apply {
 
 ## Layout Topologies (`SouthLayoutMode`)
 
-The framework offers two structural layout hierarchy options via `.southLayoutMode(...)`:
+The framework offers two structural layout hierarchy options via `.southLayoutMode(...)`. 
+You can visualize how the workspace area is divided into geometric rectangular regions below:
 
-- `COMPRESSED`: The southern dock pane is constrained in the middle, sitting strictly between the `WEST` and `EAST`
-  sidebars.
-- `EXTENDED`: The southern dock pane spans across the entire horizontal footprint of the window, sitting completely
-  underneath the sidebars.
+1. `COMPRESSED` mode: The southern panel is constrained strictly in the middle, 
+sitting rectangularly between the `WEST` and `EAST` sidebar columns.
+    ```
+    +--------------------------------------------------------+
+    |                     North Toolbars                     |
+    +--------------------------------------------------------+
+    |          |                                  |          |
+    |          |        Central Component         |          |
+    |          |                                  |          |
+    |   WEST   |----------------------------------|   EAST   |
+    | Sidebar  |                                  | Sidebar  |
+    |          |           SOUTH Panel            |          |
+    |          |           (Compressed)           |          |
+    |          |                                  |          |
+    +--------------------------------------------------------+
+    ```
+
+2. `EXTENDED` mode: The southern panel spans across the entire horizontal footprint of the window, 
+sitting completely underneath both the `WEST` and `EAST` columns.
+    ```
+    +--------------------------------------------------------+
+    |                     North Toolbars                     |
+    +--------------------------------------------------------+
+    |          |                                  |          |
+    |   WEST   |        Central Component         |   EAST   |
+    | Sidebar  |                                  | Sidebar  |
+    |          |                                  |          |
+    +--------------------------------------------------------+
+    |                      SOUTH Panel                       |
+    |                       (Extended)                       |
+    +--------------------------------------------------------+
+    ```
 
 ## UI Customization via UIManager
 
