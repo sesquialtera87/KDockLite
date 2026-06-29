@@ -9,5 +9,5 @@ module KDockLite {
 
     requires kotlin.stdlib;
 
-    opens org.mth.docking to com.formdev.flatlaf, com.formdev.flatlaf.extras, java.desktop;
+    opens org.mth.docking;
 }
