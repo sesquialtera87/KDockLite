@@ -57,7 +57,7 @@ class DemoTool(
         this.largeIcon = UIManager.getIcon("Tree.leafIcon")
 
         content.background = backgroundColor
-        setUpDock() // Inizializza l'header e il contenuto
+        setUpDock() // initialize header and content
     }
 
     override fun onHide() {

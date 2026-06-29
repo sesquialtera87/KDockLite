@@ -2,11 +2,49 @@
  * MIT License
  *
  * Copyright (c) 2026 Mattia Marelli
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package org.mth.docking
 
+import java.io.File
 import java.util.Properties
+
+/**
+ * Defines the contract for serializing and deserializing the workspace layout topology.
+ */
+interface LayoutPersister {
+    /**
+     * Serializes the given [WorkspaceState] and writes it to the target file.
+     * @param state The layout topology snapshot to save.
+     * @param output The destination file on the disk.
+     */
+    fun save(state: WorkspaceState, output: File)
+
+    /**
+     * Reads a file and reconstructs the corresponding [WorkspaceState].
+     * @param output The source file containing the serialized properties.
+     * @return The reconstructed [WorkspaceState], or null if deserialization fails.
+     */
+    fun load(output: File): WorkspaceState?
+}
 
 /**
  * Represents the complete snapshot of the workspace layout configuration for persistence.
@@ -25,7 +63,9 @@ data class WorkspaceState(
 )
 
 /**
- * Serializes this [WorkspaceState] topology into a [Properties] object.
+ * Serializes this [WorkspaceState] topology into a flat [Properties] object.
+ * Maps all layout properties, nested sub-panel side states, and floating window bounds.
+ * @return A [Properties] instance populated with the serialized workspace data topology.
  */
 fun WorkspaceState.toProperties(): Properties = Properties().apply {
     add("leftDividerLocation", leftDividerLocation)
@@ -42,7 +82,8 @@ fun WorkspaceState.toProperties(): Properties = Properties().apply {
 }
 
 /**
- * Represents the state of a specific docking side panel.
+ * Represents the state of a specific docking side panel sidebar.
+ * Tracks nested docks layout registration sequence order, visibility, and collapse states.
  */
 data class SideState(
     val dockIds: List<String>,
@@ -52,7 +93,9 @@ data class SideState(
 )
 
 /**
- * Serializes this [SideState] layout configuration into a [Properties] object.
+ * Serializes this [SideState] layout configuration into a key-value [Properties] object prefixed by the side identifier name.
+ * @param side The structural identifier key name of the side panel (e.g., "left", "right", "south").
+ * @return A [Properties] object filled with prefixed configuration metrics matching the target side context.
  */
 fun SideState.toProperties(side: String): Properties = Properties().apply {
     add("$side.dockIds", dockIds.joinToString(","))
@@ -62,7 +105,7 @@ fun SideState.toProperties(side: String): Properties = Properties().apply {
 }
 
 /**
- * Represents the geometry and structural attributes of a detached/floating dock window.
+ * Represents the geometry bounds and structural attributes of a detached/floating dock window frame.
  */
 data class FloatingDockState(
     val id: String,
@@ -73,7 +116,9 @@ data class FloatingDockState(
 )
 
 /**
- * Serializes this [FloatingDockState] geometry context into a [Properties] object.
+ * Serializes this [FloatingDockState] geometry context into an isolated key-value [Properties] object.
+ * Prefixes entries with the format `floating.{id}.*`.
+ * @return A [Properties] instance populated with explicit window coordinate parameters.
  */
 fun FloatingDockState.toProperties(): Properties = Properties().apply {
     add("floating.${id}.x", x)
@@ -83,13 +128,13 @@ fun FloatingDockState.toProperties(): Properties = Properties().apply {
 }
 
 /**
- * Ricostruisce un oggetto [WorkspaceState] a partire da un set di [Properties].
+ * Reconstructs a complete structured [WorkspaceState] topology tree parsing data values inside this [Properties] entity.
+ * Validates sub-components, properties keys, and filters corrupted or incomplete floating frame definitions.
+ * @return The restored [WorkspaceState] graph mapping historical layouts state records.
  */
 fun Properties.toWorkspaceState(): WorkspaceState {
-    // Recupera la lista degli ID dei dock floating salvati
     val floatingDockIds = getList("floating.dock")
 
-    // Ricostruisce lo stato geometrico di ciascun dock floating
     val floatingDocks = floatingDockIds.mapNotNull { id ->
         val x = getProperty("floating.$id.x")?.toIntOrNull()
         val y = getProperty("floating.$id.y")?.toIntOrNull()
@@ -99,7 +144,7 @@ fun Properties.toWorkspaceState(): WorkspaceState {
         if (x != null && y != null && width != null && height != null) {
             FloatingDockState(id = id, x = x, y = y, width = width, height = height)
         } else {
-            null // Salta se i dati geometrici sono corrotti o incompleti
+            null
         }
     }
 
@@ -115,13 +160,14 @@ fun Properties.toWorkspaceState(): WorkspaceState {
 }
 
 /**
- * Funzione di utilità interna per estrarre lo stato di un singolo lato ([SideState]).
+ * Internal private helper extension that extracts structural configuration states of an isolated side panel mapping from key keys.
+ * @param side The semantic location token string used to filter properties entry structures.
+ * @return An encapsulated [SideState] configuration object instance.
  */
 private fun Properties.getSideState(side: String): SideState {
     val dockIdsRaw = getProperty("$side.dockIds") ?: ""
     val dockIds = if (dockIdsRaw.isBlank()) emptyList() else dockIdsRaw.split(",")
 
-    // Gestisce il valore nullo o vuoto per il dock attivo in modo sicuro
     val activeDockId = getProperty("$side.active")?.takeIf { it.isNotBlank() }
 
     val isCollapsed = getProperty("$side.isCollapsed")?.toBooleanStrictOrNull() ?: true
@@ -135,10 +181,19 @@ private fun Properties.getSideState(side: String): SideState {
     )
 }
 
+/**
+ * Internal utility writing safe mappings translating string objects to keys while handling nullable values gracefully.
+ */
 internal fun Properties.add(key: String, value: Any?) {
     val v = value?.toString() ?: ""
     put(key, v)
 }
 
+/**
+ * Parses a flat character separated string token value found inside the properties object matching keys mapping definitions.
+ * @param key The database property key lookups target identifier string.
+ * @param sep The regex string token divisor symbol default set to comma values.
+ * @return A structured list of isolated string items found.
+ */
 internal fun Properties.getList(key: String, sep: String = ","): List<String> =
     this.getProperty(key)?.split(sep) ?: emptyList()
