@@ -52,7 +52,7 @@ abstract class AbstractDock : JPanel() {
             return UIManager.getIcon(key) ?: run {
                 val path =
                     if (FlatLaf.isLafDark()) "org/mth/docking/minimize_dark.svg" else "org/mth/docking/minimize.svg"
-                FlatSVGIcon(path, 18, 18).also { UIManager.put(key, it) }
+                FlatSVGIcon(path, 18, 18, Workspace::class.java.classLoader).also { UIManager.put(key, it) }
             }
         }
 
@@ -65,7 +65,7 @@ abstract class AbstractDock : JPanel() {
                 return UIManager.getIcon(key) ?: run {
                     val path =
                         if (FlatLaf.isLafDark()) "org/mth/docking/close_dark.svg" else "org/mth/docking/close.svg"
-                    FlatSVGIcon(path, 18, 18).also { UIManager.put(key, it) }
+                    FlatSVGIcon(path, 18, 18, Workspace::class.java.classLoader).also { UIManager.put(key, it) }
                 }
             }
 
