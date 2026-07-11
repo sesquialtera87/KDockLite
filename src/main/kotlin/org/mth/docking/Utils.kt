@@ -79,8 +79,7 @@ internal fun Icon.toImage(): Image {
  * for Swing [JComponent] properties.
  *
  * This implementation accesses the public [JComponent.propertyChangeListeners] array to propagate
- * changes safely, allowing [javax.beans.PropertyChangeListenerProxy] instances to automatically filter
- * named properties without event duplication.
+ * changes safely.
  *
  * @param T The type of the property being encapsulated.
  * @param comp The target [JComponent] host that will dispatch the property change notifications.
@@ -98,13 +97,20 @@ internal fun <T> swingProperty(comp: JComponent, initialValue: T): ReadWriteProp
             if (oldValue != value) {
                 this.value = value
 
-                // Creiamo l'evento standard dei Java Beans
                 val event = java.beans.PropertyChangeEvent(comp, property.name, oldValue, value)
 
-                // Sfruttiamo l'array pubblico dei listener. I listener con nome (Proxy)
-                // filtreranno automaticamente l'evento in base a property.name senza duplicazioni.
+                // firePropertyChange non è invocabile da qui (protected): replichiamo
+                // manualmente il suo filtro. I listener "nudi" ricevono sempre l'evento;
+                // quelli avvolti in un PropertyChangeListenerProxy solo se il nome combacia.
                 comp.propertyChangeListeners.forEach { listener ->
-                    listener.propertyChange(event)
+                    when (listener) {
+                        is java.beans.PropertyChangeListenerProxy ->
+                            if (listener.propertyName == property.name) {
+                                listener.propertyChange(event)
+                            }
+
+                        else -> listener.propertyChange(event)
+                    }
                 }
             }
         }

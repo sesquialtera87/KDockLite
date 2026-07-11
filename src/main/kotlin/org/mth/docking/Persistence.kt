@@ -25,7 +25,8 @@
 package org.mth.docking
 
 import java.io.File
-import java.util.Properties
+import java.util.*
+import javax.swing.SwingConstants
 
 /**
  * Defines the contract for serializing and deserializing the workspace layout topology.
@@ -112,7 +113,8 @@ data class FloatingDockState(
     val x: Int,
     val y: Int,
     val width: Int,
-    val height: Int
+    val height: Int,
+    val sideLocation: Int
 )
 
 /**
@@ -125,6 +127,7 @@ fun FloatingDockState.toProperties(): Properties = Properties().apply {
     add("floating.${id}.y", y)
     add("floating.${id}.width", width)
     add("floating.${id}.height", height)
+    add("floating.${id}.sideLocation", sideLocation)
 }
 
 /**
@@ -140,9 +143,17 @@ fun Properties.toWorkspaceState(): WorkspaceState {
         val y = getProperty("floating.$id.y")?.toIntOrNull()
         val width = getProperty("floating.$id.width")?.toIntOrNull()
         val height = getProperty("floating.$id.height")?.toIntOrNull()
+        val sideLocation = getProperty("floating.$id.sideLocation").toIntOrNull() ?: SwingConstants.WEST
 
         if (x != null && y != null && width != null && height != null) {
-            FloatingDockState(id = id, x = x, y = y, width = width, height = height)
+            FloatingDockState(
+                id = id,
+                x = x,
+                y = y,
+                width = width,
+                height = height,
+                sideLocation = sideLocation
+            )
         } else {
             null
         }
