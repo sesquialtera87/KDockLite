@@ -93,12 +93,14 @@ object PersistenceManager {
             .filter { it.floating }
             .mapNotNull { dock ->
                 val dialog = SwingUtilities.windowForComponent(dock) ?: return@mapNotNull null
+                val location = dock.sideLocation ?: return@mapNotNull null
                 FloatingDockState(
                     id = dock.id,
                     x = dialog.x,
                     y = dialog.y,
                     width = dialog.width,
-                    height = dialog.height
+                    height = dialog.height,
+                    sideLocation = location
                 )
             }
 
@@ -151,8 +153,14 @@ object PersistenceManager {
                 dock.floatDimension = Dimension(floatState.width, floatState.height)
                 dock.lastFloatPosition = Point(floatState.x, floatState.y)
 
-                workspace.leftSide.addDock(dock, fire = false)
-                workspace.leftSide.detach(dock)
+                val side = when(floatState.sideLocation) {
+                    SwingConstants.SOUTH->workspace.southSide
+                    SwingConstants.WEST->workspace.leftSide
+                    else -> workspace.rightSide
+                }
+
+                side.addDock(dock, fire = false)
+                side.detach(dock)
             }
         }
 
