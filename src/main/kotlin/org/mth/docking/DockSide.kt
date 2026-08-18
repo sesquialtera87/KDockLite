@@ -170,7 +170,7 @@ class DockSide(val workspace: Workspace, var split: FlatSplitPane, var sideLocat
     }
 
     /** Checks whether any action toggle item inside the toolbar is currently selected. */
-    val isCollapsed get() = toolBar.components.filterIsInstance<FlatToggleButton>().count { it.isSelected } != 0
+    val isCollapsed: Boolean get() = split.dividerSize == 0
 
     /**
      * Commands the parent split frame infrastructure to unfold, sliding out to make the requested tool view visible.
@@ -178,14 +178,12 @@ class DockSide(val workspace: Workspace, var split: FlatSplitPane, var sideLocat
      */
     fun showComponent(dock: AbstractDock) = SwingUtilities.invokeLater {
         if (dock.visibleOnScreen) {
-            log.fine { "Dock already opened" } //LOG
+            log.fine { "Dock already opened" }
             return@invokeLater
         }
 
-        // Remove preceding shown component view wrappers
         components.filterIsInstance<AbstractDock>().forEach { d -> remove(d) }
 
-        // Hide and notify the previously focused open dock view element
         docks.filter { d -> d !== dock }
             .firstOrNull { it.visibleOnScreen }
             ?.run {
