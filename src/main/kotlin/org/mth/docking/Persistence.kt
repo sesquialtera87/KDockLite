@@ -143,7 +143,7 @@ fun Properties.toWorkspaceState(): WorkspaceState {
         val y = getProperty("floating.$id.y")?.toIntOrNull()
         val width = getProperty("floating.$id.width")?.toIntOrNull()
         val height = getProperty("floating.$id.height")?.toIntOrNull()
-        val sideLocation = getProperty("floating.$id.sideLocation").toIntOrNull() ?: SwingConstants.WEST
+        val sideLocation = getProperty("floating.$id.sideLocation")?.toIntOrNull() ?: SwingConstants.WEST
 
         if (x != null && y != null && width != null && height != null) {
             FloatingDockState(
